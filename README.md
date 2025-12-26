@@ -1,11 +1,12 @@
-# Police Hat Filter - Patrol Mode Studio
+# Hat Filter Studio
 
-A fun webcam filter that adds a police hat overlay to your face in real-time using face tracking technology.
+A fun webcam filter that adds various hat overlays to your face in real-time using face tracking technology.
 
 ## Features
 
 - Real-time face tracking with MediaPipe Face Mesh
-- Customizable badge name on the police hat
+- Multiple hat types: Police, Chef, Wizard, Cowboy, Party
+- Customizable badge/name text on hats
 - Adjustable hat size
 - Bilingual support (English & Arabic)
 - Modern, responsive design
@@ -50,4 +51,4 @@ This project uses the following libraries under the Apache License 2.0:
 
 ---
 
-Built for playful patrol vibes! 🎩👮
+Built for fun video calls! 🎩🎉

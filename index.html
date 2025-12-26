@@ -1,16 +1,16 @@
 <!doctype html>
 <!--
-  Police Hat Filter - Patrol Mode Studio
+  Hat Filter - Fun Video Filter Studio
   Copyright (c) 2025 Magnus Zaza. All rights reserved.
   Licensed under the MIT License. See LICENSE file for details.
   
   Uses MediaPipe Face Mesh (Apache 2.0) for face tracking.
 -->
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Police Hat Filter</title>
+  <title>Hat Filter Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@
   <div class="language-selector">
     <select id="languageSelect" aria-label="Select language">
       <option value="en">English</option>
-      <option value="ar">العربية</option>
+      <option value="ar" selected>العربية</option>
     </select>
   </div>
   <div class="app-shell">
@@ -748,8 +748,8 @@
     // Translation dictionary
     const translations = {
       en: {
-        title: 'Patrol Mode Studio',
-        subtitle: 'Slip on your digital police cap, customize the badge name, and bring the fun to any call.',
+        title: 'Hat Filter Studio',
+        subtitle: 'Choose your favorite hat, customize it with your name, and add fun to any video call.',
         hatType: 'Hat type',
         hatPolice: 'Police',
         hatChef: 'Chef',
@@ -768,7 +768,7 @@
         recenterHat: 'Recenter hat',
         waitingToBegin: 'Waiting to begin',
         noteText: 'Face the camera with even lighting for reliable tracking. Adjust the hat size or badge name any time.',
-        footer: 'Built for playful patrol vibes. Grant camera access when prompted to dive in.',
+        footer: 'Built for fun video calls. Grant camera access when prompted to dive in.',
         statusLookingForFace: 'Looking for a face...',
         statusHatLocked: 'Hat locked in!',
         statusPreparing: 'Preparing session...',
@@ -783,8 +783,8 @@
         statusHoldSteady: 'Hold steady'
       },
       ar: {
-        title: 'استوديو وضع الدورية',
-        subtitle: 'ارتدِ قبعة الشرطة الرقمية، خصص اسم الشارة، وأضف المرح إلى أي مكالمة.',
+        title: 'استوديو فلتر القبعات',
+        subtitle: 'اختر قبعتك المفضلة، خصصها باسمك، وأضف المرح إلى أي مكالمة فيديو.',
         hatType: 'نوع القبعة',
         hatPolice: 'شرطة',
         hatChef: 'طباخ',
@@ -803,7 +803,7 @@
         recenterHat: 'إعادة توسيط القبعة',
         waitingToBegin: 'في انتظار البدء',
         noteText: 'واجه الكاميرا بإضاءة متساوية للحصول على تتبع موثوق. اضبط حجم القبعة أو اسم الشارة في أي وقت.',
-        footer: 'مصمم لأجواء دورية ممتعة. امنح الوصول للكاميرا عندما يُطلب منك ذلك.',
+        footer: 'مصمم لمكالمات فيديو ممتعة. امنح الوصول للكاميرا عندما يُطلب منك ذلك.',
         statusLookingForFace: 'البحث عن وجه...',
         statusHatLocked: 'القبعة مثبتة!',
         statusPreparing: 'جاري التحضير...',
@@ -819,7 +819,7 @@
       }
     };
 
-    let currentLanguage = 'en';
+    let currentLanguage = 'ar';
 
     function setLanguage(lang) {
       currentLanguage = lang;
@@ -1227,6 +1227,8 @@
     });
     window.addEventListener('beforeunload', () => stop({ silent: true }));
 
+    // Initialize with Arabic language
+    setLanguage('ar');
     setStatus(getStatusMessage('waitingToBegin'), 'idle');
     handleNameInput();
     fadeHat();
