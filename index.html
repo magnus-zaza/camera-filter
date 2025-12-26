@@ -4,10 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Police Hat Filter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: light dark;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [dir="rtl"] {
+      font-family: "Cairo", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     body {
@@ -19,6 +26,42 @@
       padding: 48px 24px;
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 35%, #0b1120 100%);
       color: #0f172a;
+    }
+
+    .language-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    [dir="rtl"] .language-selector {
+      right: auto;
+      left: 20px;
+    }
+
+    .language-selector select {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(226, 232, 240, 0.3);
+      background: rgba(15, 23, 42, 0.8);
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .language-selector select:hover {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(226, 232, 240, 0.5);
+    }
+
+    .language-selector select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
     @keyframes button-spin {
@@ -508,32 +551,38 @@
 
 </head>
 <body>
+  <div class="language-selector">
+    <select id="languageSelect" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="ar">العربية</option>
+    </select>
+  </div>
   <div class="app-shell">
     <header>
-      <h1 class="hero-title">Patrol Mode Studio</h1>
-      <p class="hero-subtitle">Slip on your digital police cap, customize the badge name, and bring the fun to any call.</p>
+      <h1 class="hero-title" data-i18n="title">Patrol Mode Studio</h1>
+      <p class="hero-subtitle" data-i18n="subtitle">Slip on your digital police cap, customize the badge name, and bring the fun to any call.</p>
     </header>
 
     <section class="card">
       <div class="control-bar">
         <div class="field">
-          <label for="name">Display name</label>
-          <input id="name" class="input-text" type="text" placeholder="Type the badge name..." autocomplete="off" />
+          <label for="name" data-i18n="displayName">Display name</label>
+          <input id="name" class="input-text" type="text" data-i18n-placeholder="namePlaceholder" placeholder="Type the badge name..." autocomplete="off" />
         </div>
         <div class="field">
-          <label>Session controls</label>
+          <label data-i18n="sessionControls">Session controls</label>
           <div class="button-row">
-            <button id="startBtn" type="button" class="btn-primary">Start camera</button>
-            <button id="stopBtn" type="button" class="btn-ghost" disabled>Stop camera</button>
+            <button id="startBtn" type="button" class="btn-primary" data-i18n="startCamera">Start camera</button>
+            <button id="stopBtn" type="button" class="btn-ghost" disabled data-i18n="stopCamera">Stop camera</button>
           </div>
         </div>
       </div>
 
       <div id="stage" class="stage">
         <div id="stagePlaceholder" class="stage-placeholder" aria-hidden="true">
-          <span class="placeholder-badge">Live Preview</span>
-          <h2 class="placeholder-title">Ready when you are</h2>
-          <p class="placeholder-subtitle">Start the camera to unlock the tracker and watch the hat snap into place.</p>
+          <span class="placeholder-badge" data-i18n="livePreview">Live Preview</span>
+          <h2 class="placeholder-title" data-i18n="readyTitle">Ready when you are</h2>
+          <p class="placeholder-subtitle" data-i18n="readySubtitle">Start the camera to unlock the tracker and watch the hat snap into place.</p>
         </div>
         <video id="video" playsinline autoplay muted></video>
         <div id="hat" class="hat" role="img" aria-label="Police hat overlay">
@@ -556,24 +605,24 @@
 
       <div class="secondary-controls">
         <div class="slider-group">
-          <label for="sizeRange">Hat size</label>
+          <label for="sizeRange" data-i18n="hatSize">Hat size</label>
           <input id="sizeRange" type="range" min="0.6" max="2.0" step="0.1" value="1.2" />
         </div>
         <div class="button-row">
-          <button id="centerBtn" type="button" class="btn-ghost">Recenter hat</button>
+          <button id="centerBtn" type="button" class="btn-ghost" data-i18n="recenterHat">Recenter hat</button>
         </div>
         <div id="status" class="status" aria-live="polite">
-          <span id="statusPill" class="status-pill">Waiting to begin</span>
+          <span id="statusPill" class="status-pill" data-i18n="waitingToBegin">Waiting to begin</span>
         </div>
       </div>
 
       <div class="note">
         <span class="note-icon">i</span>
-        <span>Face the camera with even lighting for reliable tracking. Adjust the hat size or badge name any time.</span>
+        <span data-i18n="noteText">Face the camera with even lighting for reliable tracking. Adjust the hat size or badge name any time.</span>
       </div>
     </section>
 
-    <footer>
+    <footer data-i18n="footer">
       Built for playful patrol vibes. Grant camera access when prompted to dive in.
     </footer>
   </div>
@@ -592,6 +641,102 @@
     const centerBtn = document.getElementById('centerBtn');
     const statusEl = document.getElementById('status');
     const statusPill = document.getElementById('statusPill');
+    const languageSelect = document.getElementById('languageSelect');
+
+    // Translation dictionary
+    const translations = {
+      en: {
+        title: 'Patrol Mode Studio',
+        subtitle: 'Slip on your digital police cap, customize the badge name, and bring the fun to any call.',
+        displayName: 'Display name',
+        namePlaceholder: 'Type the badge name...',
+        sessionControls: 'Session controls',
+        startCamera: 'Start camera',
+        stopCamera: 'Stop camera',
+        livePreview: 'Live Preview',
+        readyTitle: 'Ready when you are',
+        readySubtitle: 'Start the camera to unlock the tracker and watch the hat snap into place.',
+        hatSize: 'Hat size',
+        recenterHat: 'Recenter hat',
+        waitingToBegin: 'Waiting to begin',
+        noteText: 'Face the camera with even lighting for reliable tracking. Adjust the hat size or badge name any time.',
+        footer: 'Built for playful patrol vibes. Grant camera access when prompted to dive in.',
+        statusLookingForFace: 'Looking for a face...',
+        statusHatLocked: 'Hat locked in!',
+        statusPreparing: 'Preparing session...',
+        statusLoading: 'Loading tracking libraries...',
+        statusStartingCamera: 'Starting camera...',
+        statusMoveIntoView: 'Move into view so the hat can lock on.',
+        statusIdle: 'Camera idle. Hit start when you are ready.',
+        statusReset: 'Tracking reset. Hold still for a moment.',
+        statusAllSet: 'All set',
+        statusWorking: 'Working...',
+        statusActionNeeded: 'Action needed',
+        statusHoldSteady: 'Hold steady'
+      },
+      ar: {
+        title: 'استوديو وضع الدورية',
+        subtitle: 'ارتدِ قبعة الشرطة الرقمية، خصص اسم الشارة، وأضف المرح إلى أي مكالمة.',
+        displayName: 'اسم العرض',
+        namePlaceholder: 'اكتب اسم الشارة...',
+        sessionControls: 'عناصر التحكم',
+        startCamera: 'تشغيل الكاميرا',
+        stopCamera: 'إيقاف الكاميرا',
+        livePreview: 'معاينة مباشرة',
+        readyTitle: 'جاهز عندما تكون مستعداً',
+        readySubtitle: 'ابدأ تشغيل الكاميرا لفتح التتبع ومشاهدة القبعة تثبت في مكانها.',
+        hatSize: 'حجم القبعة',
+        recenterHat: 'إعادة توسيط القبعة',
+        waitingToBegin: 'في انتظار البدء',
+        noteText: 'واجه الكاميرا بإضاءة متساوية للحصول على تتبع موثوق. اضبط حجم القبعة أو اسم الشارة في أي وقت.',
+        footer: 'مصمم لأجواء دورية ممتعة. امنح الوصول للكاميرا عندما يُطلب منك ذلك.',
+        statusLookingForFace: 'البحث عن وجه...',
+        statusHatLocked: 'القبعة مثبتة!',
+        statusPreparing: 'جاري التحضير...',
+        statusLoading: 'تحميل مكتبات التتبع...',
+        statusStartingCamera: 'بدء تشغيل الكاميرا...',
+        statusMoveIntoView: 'تحرك إلى العرض حتى تتمكن القبعة من التثبيت.',
+        statusIdle: 'الكاميرا في وضع الخمول. اضغط على بدء عندما تكون جاهزاً.',
+        statusReset: 'إعادة تعيين التتبع. امكث ثابتاً للحظة.',
+        statusAllSet: 'كل شيء جاهز',
+        statusWorking: 'جاري العمل...',
+        statusActionNeeded: 'مطلوب إجراء',
+        statusHoldSteady: 'ابق ثابتاً'
+      }
+    };
+
+    let currentLanguage = 'en';
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.documentElement.setAttribute('lang', lang);
+      document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+      
+      // Update all elements with data-i18n attribute
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+
+      // Update placeholder
+      const placeholderKey = nameInput.getAttribute('data-i18n-placeholder');
+      if (placeholderKey && translations[lang] && translations[lang][placeholderKey]) {
+        nameInput.placeholder = translations[lang][placeholderKey];
+      }
+
+      // Update page title
+      document.title = translations[lang].title;
+    }
+
+    function getStatusMessage(key) {
+      return translations[currentLanguage][key] || key;
+    }
+
+    languageSelect.addEventListener('change', (e) => {
+      setLanguage(e.target.value);
+    });
 
     const CAMERA_UTIL_URLS = [
       'libs/camera_utils.js',
@@ -633,11 +778,11 @@
         return;
       }
       const trimmed = message ? message.trim() : '';
-      let fallback = 'Working...';
-      if (tone === 'ready') fallback = 'All set';
-      else if (tone === 'idle') fallback = 'Waiting to begin';
-      else if (tone === 'error') fallback = 'Action needed';
-      else if (tone === 'warn') fallback = 'Hold steady';
+      let fallback = getStatusMessage('statusWorking');
+      if (tone === 'ready') fallback = getStatusMessage('statusAllSet');
+      else if (tone === 'idle') fallback = getStatusMessage('waitingToBegin');
+      else if (tone === 'error') fallback = getStatusMessage('statusActionNeeded');
+      else if (tone === 'warn') fallback = getStatusMessage('statusHoldSteady');
 
       statusPill.textContent = trimmed || fallback;
       statusPill.classList.remove('ready', 'alert', 'idle', 'warn');
@@ -771,14 +916,14 @@
       if (!face) {
         const now = performance.now();
         if (now - lastFaceTs > 800) {
-          setStatus('Looking for a face...', 'warn');
+          setStatus(getStatusMessage('statusLookingForFace'), 'warn');
         }
         fadeHat();
         return;
       }
 
       lastFaceTs = performance.now();
-      setStatus('Hat locked in!', 'ready');
+      setStatus(getStatusMessage('statusHatLocked'), 'ready');
       const targetPose = computePose(face);
       if (!targetPose) {
         fadeHat();
@@ -811,7 +956,7 @@
     async function start() {
       if (trackingActive) return;
 
-      setStatus('Preparing session...');
+      setStatus(getStatusMessage('statusPreparing'));
       if (!navigator.mediaDevices?.getUserMedia) {
         setStatus('Camera API not supported in this browser.', 'error');
         return;
@@ -821,7 +966,7 @@
       startBtn.disabled = true;
 
       try {
-        setStatus('Loading tracking libraries...');
+        setStatus(getStatusMessage('statusLoading'));
         await ensureLibrariesLoaded();
       } catch (error) {
         console.error('Tracking library load failed', error);
@@ -874,7 +1019,7 @@
           height: 720
         });
 
-        setStatus('Starting camera...');
+        setStatus(getStatusMessage('statusStartingCamera'));
         await camera.start();
         if (stagePlaceholder) {
           // Fade placeholder once live feed is running.
@@ -883,7 +1028,7 @@
         setStartLoading(false);
         trackingActive = true;
         stopBtn.disabled = false;
-        setStatus('Move into view so the hat can lock on.', 'ready');
+        setStatus(getStatusMessage('statusMoveIntoView'), 'ready');
       } catch (error) {
         setStatus('Camera setup failed: ' + (error?.message || String(error)), 'error');
         stop({ silent: true });
@@ -925,7 +1070,7 @@
         stagePlaceholder.classList.remove('hidden');
       }
       if (!silent) {
-        setStatus('Camera idle. Hit start when you are ready.', 'idle');
+        setStatus(getStatusMessage('statusIdle'), 'idle');
       }
     }
 
@@ -946,7 +1091,7 @@
 
     centerBtn.addEventListener('click', () => {
       smoothedPose = null;
-      setStatus('Tracking reset. Hold still for a moment.', 'warn');
+      setStatus(getStatusMessage('statusReset'), 'warn');
     });
 
     nameInput.addEventListener('input', handleNameInput);
@@ -960,7 +1105,7 @@
     });
     window.addEventListener('beforeunload', () => stop({ silent: true }));
 
-    setStatus('Waiting to begin', 'idle');
+    setStatus(getStatusMessage('waitingToBegin'), 'idle');
     handleNameInput();
     fadeHat();
   </script>
