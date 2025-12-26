@@ -5,25 +5,42 @@
   Licensed under the MIT License. See LICENSE file for details.
   
   Uses MediaPipe Face Mesh (Apache 2.0) for face tracking.
+  
+  OVERVIEW:
+  This is a real-time face filter application that overlays various hat designs
+  on the user's head using webcam feed and face landmark detection. The app
+  supports multiple hat types, bilingual interface (English/Arabic), and
+  customizable hat text.
 -->
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hat Filter Studio</title>
+  
+  <!-- Preconnect to Google Fonts for faster loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Cairo font for Arabic language support -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  
   <style>
+    /* ============================================
+       CSS VARIABLES AND GLOBAL STYLES
+       ============================================ */
+    
+    /* Root variables - applies to all elements */
     :root {
-      color-scheme: light dark;
+      color-scheme: light dark; /* Enable dark mode support */
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+    /* RTL (Right-to-Left) specific font stack for Arabic */
     [dir="rtl"] {
       font-family: "Cairo", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+    /* Body styling - creates centered layout with gradient background */
     body {
       margin: 0;
       min-height: 100vh;
@@ -35,18 +52,25 @@
       color: #0f172a;
     }
 
+    /* ============================================
+       LANGUAGE SELECTOR STYLES
+       ============================================ */
+    
+    /* Language selector positioned at top-right */
     .language-selector {
       position: absolute;
       top: 20px;
       right: 20px;
-      z-index: 100;
+      z-index: 100; /* Ensure it stays above other elements */
     }
 
+    /* In RTL mode, move to top-left instead */
     [dir="rtl"] .language-selector {
       right: auto;
       left: 20px;
     }
 
+    /* Language dropdown styling */
     .language-selector select {
       padding: 8px 16px;
       border-radius: 10px;
@@ -57,26 +81,38 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px); /* Blur effect for glass-morphism */
     }
 
+    /* Hover state for language selector */
     .language-selector select:hover {
       background: rgba(15, 23, 42, 0.95);
       border-color: rgba(226, 232, 240, 0.5);
     }
 
+    /* Focus state for accessibility */
     .language-selector select:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    /* Spinning animation for loading button indicator */
     @keyframes button-spin {
       to {
         transform: rotate(360deg);
       }
     }
 
+    /* ============================================
+       LAYOUT COMPONENTS
+       ============================================ */
+    
+    /* Main application container - responsive width */
     .app-shell {
       width: min(960px, 100%);
       display: flex;
@@ -84,6 +120,7 @@
       gap: 28px;
     }
 
+    /* Header section styling */
     header {
       display: flex;
       flex-direction: column;
@@ -91,6 +128,7 @@
       color: #e2e8f0;
     }
 
+    /* Main title with responsive sizing using clamp */
     .hero-title {
       font-size: clamp(32px, 4vw, 44px);
       font-weight: 700;
