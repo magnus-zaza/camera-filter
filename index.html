@@ -690,6 +690,7 @@
         </div>
         <div class="button-row">
           <button id="centerBtn" type="button" class="btn-ghost" data-i18n="recenterHat">Recenter hat</button>
+          <button id="fullscreenBtn" type="button" class="btn-ghost" data-i18n="fullscreen">Fullscreen</button>
         </div>
         <div id="status" class="status" aria-live="polite">
           <span id="statusPill" class="status-pill" data-i18n="waitingToBegin">Waiting to begin</span>
@@ -725,8 +726,54 @@
     const statusPill = document.getElementById('statusPill');
     const languageSelect = document.getElementById('languageSelect');
     const hatTypeSelect = document.getElementById('hatType');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     let currentHatType = 'police';
+    let isFullscreen = false;
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+        // Enter fullscreen
+        const elem = stage;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        }
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    function updateFullscreenButton() {
+      isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+      if (isFullscreen) {
+        fullscreenBtn.textContent = getStatusMessage('exitFullscreen');
+      } else {
+        fullscreenBtn.textContent = getStatusMessage('fullscreen');
+      }
+    }
+
+    // Listen for fullscreen changes
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
+
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
 
     function switchHat(hatType) {
       currentHatType = hatType;
@@ -766,6 +813,8 @@
         readySubtitle: 'Start the camera to unlock the tracker and watch the hat snap into place.',
         hatSize: 'Hat size',
         recenterHat: 'Recenter hat',
+        fullscreen: 'Fullscreen',
+        exitFullscreen: 'Exit fullscreen',
         waitingToBegin: 'Waiting to begin',
         noteText: 'Face the camera with even lighting for reliable tracking. Adjust the hat size or badge name any time.',
         footer: 'Built for fun video calls. Grant camera access when prompted to dive in.',
@@ -801,6 +850,8 @@
         readySubtitle: 'ابدأ تشغيل الكاميرا لفتح التتبع ومشاهدة القبعة تثبت في مكانها.',
         hatSize: 'حجم القبعة',
         recenterHat: 'إعادة توسيط القبعة',
+        fullscreen: 'ملء الشاشة',
+        exitFullscreen: 'الخروج من ملء الشاشة',
         waitingToBegin: 'في انتظار البدء',
         noteText: 'واجه الكاميرا بإضاءة متساوية للحصول على تتبع موثوق. اضبط حجم القبعة أو اسم الشارة في أي وقت.',
         footer: 'مصمم لمكالمات فيديو ممتعة. امنح الوصول للكاميرا عندما يُطلب منك ذلك.',
