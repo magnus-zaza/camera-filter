@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Police Hat Filter</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 35%, #0b1120 100%);
+      color: #0f172a;
+    }
+
+    @keyframes button-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .app-shell {
+      width: min(960px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: #e2e8f0;
+    }
+
+    .hero-title {
+      font-size: clamp(32px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(16px, 2vw, 20px);
+      color: rgba(226, 232, 240, 0.85);
+      margin: 0;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 24px;
+      padding: clamp(20px, 3vw, 32px);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 40px 80px rgba(15, 23, 42, 0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .control-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      align-items: center;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .input-text {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(248, 250, 252, 0.85);
+      font-size: 16px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-text:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.55);
+      outline-offset: 2px;
+    }
+
+    .btn-primary.is-busy {
+      position: relative;
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .btn-primary.is-busy::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      margin-top: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-top-color: transparent;
+      animation: button-spin 0.8s linear infinite;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      box-shadow: 0 18px 24px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 30px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-ghost {
+      background: rgba(37, 99, 235, 0.08);
+      color: #1d4ed8;
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      background: rgba(37, 99, 235, 0.15);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.35), rgba(14, 116, 144, 0.1) 35%, rgba(15, 23, 42, 0.85) 75%);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .stage::before,
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .stage::before {
+      background: radial-gradient(circle at 80% 15%, rgba(59, 130, 246, 0.25), transparent 55%),
+        radial-gradient(circle at 20% 85%, rgba(236, 72, 153, 0.22), transparent 50%);
+      mix-blend-mode: screen;
+    }
+
+    .stage::after {
+      inset: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      mix-blend-mode: overlay;
+    }
+
+    .stage-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 0 32px;
+      text-align: center;
+      color: rgba(226, 232, 240, 0.92);
+      background: linear-gradient(160deg, rgba(15, 23, 42, 0.85), rgba(30, 64, 175, 0.55));
+      backdrop-filter: blur(6px);
+      z-index: 1;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      pointer-events: none;
+    }
+
+    .stage-placeholder.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .placeholder-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(96, 165, 250, 0.28);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .placeholder-title {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.25px;
+    }
+
+    .placeholder-subtitle {
+      margin: 0;
+      font-size: clamp(14px, 2.2vw, 18px);
+      color: rgba(226, 232, 240, 0.78);
+      max-width: 420px;
+      line-height: 1.6;
+    }
+
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .hat {
+      position: absolute;
+      top: 32%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .hat svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .hat-name {
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      transform: translate(-50%, -50%);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: #ffe27a;
+      text-shadow: 0 3px 18px rgba(15, 23, 42, 0.75);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      font-size: clamp(14px, 3.2vw, 28px);
+    }
+
+    .secondary-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .slider-group label {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #475569;
+    }
+
+    input[type="range"] {
+      accent-color: #2563eb;
+      width: 180px;
+    }
+
+    .note {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: rgba(37, 99, 235, 0.08);
+      color: #1e293b;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .note-icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.15);
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .status {
+      min-height: 1.4em;
+      font-weight: 600;
+      color: #0f172a;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.08);
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .status-pill.ready {
+      color: #15803d;
+    }
+
+    .status-pill.alert {
+      color: #b91c1c;
+    }
+
+    .status-pill.warn {
+      color: #b45309;
+    }
+
+    .status-pill.idle {
+      color: #475569;
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.24);
+    }
+
+    .status-pill.ready::before {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+    }
+
+    .status-pill.alert::before {
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.24);
+    }
+
+    .status-pill.idle::before {
+      background: #94a3b8;
+      box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.24);
+    }
+
+    .status-pill.warn::before {
+      background: #f59e0b;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.24);
+    }
+
+    footer {
+      color: rgba(226, 232, 240, 0.6);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    footer a {
+      color: rgba(148, 197, 255, 0.9);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 720px) {
+      .card {
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      .secondary-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      input[type="range"] {
+        width: 100%;
+      }
+
+      .status {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: radial-gradient(circle at top, rgba(37, 99, 235, 0.25), rgba(15, 23, 42, 1));
+        color: #e2e8f0;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #e2e8f0;
+      }
+
+      .field label,
+      .slider-group label {
+        color: rgba(226, 232, 240, 0.75);
+      }
+
+      .input-text {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(148, 163, 184, 0.35);
+        color: #f8fafc;
+      }
+
+      .btn-ghost {
+        background: rgba(37, 99, 235, 0.18);
+        color: #bfdbfe;
+      }
+
+      .btn-ghost:hover:not(:disabled) {
+        background: rgba(37, 99, 235, 0.28);
+      }
+
+      .note {
+        background: rgba(37, 99, 235, 0.18);
+        color: #f8fafc;
+      }
+
+      .status-pill {
+        background: rgba(148, 163, 184, 0.18);
+        color: #cbd5f5;
+      }
+
+      .status-pill.ready {
+        color: #86efac;
+      }
+
+      .status-pill.alert {
+        color: #fca5a5;
+      }
+
+      .status-pill.warn {
+        color: #fcd34d;
+      }
+
+      .status-pill.idle {
+        color: #cbd5f5;
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <h1 class="hero-title">Patrol Mode Studio</h1>
+      <p class="hero-subtitle">Slip on your digital police cap, customize the badge name, and bring the fun to any call.</p>
+    </header>
+
+    <section class="card">
+      <div class="control-bar">
+        <div class="field">
+          <label for="name">Display name</label>
+          <input id="name" class="input-text" type="text" placeholder="Type the badge name..." autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Session controls</label>
+          <div class="button-row">
+            <button id="startBtn" type="button" class="btn-primary">Start camera</button>
+            <button id="stopBtn" type="button" class="btn-ghost" disabled>Stop camera</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="stage" class="stage">
+        <div id="stagePlaceholder" class="stage-placeholder" aria-hidden="true">
+          <span class="placeholder-badge">Live Preview</span>
+          <h2 class="placeholder-title">Ready when you are</h2>
+          <p class="placeholder-subtitle">Start the camera to unlock the tracker and watch the hat snap into place.</p>
+        </div>
+        <video id="video" playsinline autoplay muted></video>
+        <div id="hat" class="hat" role="img" aria-label="Police hat overlay">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380">
+            <defs>
+              <linearGradient id="hatGradient" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#2b2f38" />
+                <stop offset="1" stop-color="#0d0f14" />
+              </linearGradient>
+            </defs>
+            <path d="M50 240 C150 190, 450 190, 550 240 C460 320, 140 320, 50 240 Z" fill="#141822" stroke="#000" stroke-opacity="0.35" stroke-width="6" />
+            <path d="M120 230 C160 120, 440 120, 480 230 C410 205, 190 205, 120 230 Z" fill="url(#hatGradient)" stroke="#000" stroke-opacity="0.35" stroke-width="6" />
+            <rect x="150" y="210" width="300" height="44" rx="18" fill="#121621" opacity="0.95" />
+            <path d="M300 150 C330 170, 360 190, 360 220 C360 270, 325 300, 300 312 C275 300, 240 270, 240 220 C240 190, 270 170, 300 150 Z" fill="#f2c14e" stroke="#9a6f10" stroke-width="8" />
+            <circle cx="300" cy="230" r="22" fill="#ffe08a" stroke="#9a6f10" stroke-width="6" />
+          </svg>
+          <div id="hatName" class="hat-name"></div>
+        </div>
+      </div>
+
+      <div class="secondary-controls">
+        <div class="slider-group">
+          <label for="sizeRange">Hat size</label>
+          <input id="sizeRange" type="range" min="0.6" max="2.0" step="0.1" value="1.2" />
+        </div>
+        <div class="button-row">
+          <button id="centerBtn" type="button" class="btn-ghost">Recenter hat</button>
+        </div>
+        <div id="status" class="status" aria-live="polite">
+          <span id="statusPill" class="status-pill">Waiting to begin</span>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="note-icon">i</span>
+        <span>Face the camera with even lighting for reliable tracking. Adjust the hat size or badge name any time.</span>
+      </div>
+    </section>
+
+    <footer>
+      Built for playful patrol vibes. Grant camera access when prompted to dive in.
+    </footer>
+  </div>
+
+  <script>
+    'use strict';
+    const nameInput = document.getElementById('name');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const stage = document.getElementById('stage');
+    const video = document.getElementById('video');
+    const stagePlaceholder = document.getElementById('stagePlaceholder');
+    const hat = document.getElementById('hat');
+    const hatName = document.getElementById('hatName');
+    const sizeRange = document.getElementById('sizeRange');
+    const centerBtn = document.getElementById('centerBtn');
+    const statusEl = document.getElementById('status');
+    const statusPill = document.getElementById('statusPill');
+
+    const CAMERA_UTIL_URLS = [
+      'libs/camera_utils.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.1.1679/camera_utils.js',
+      'https://unpkg.com/@mediapipe/camera_utils@0.1.1679/camera_utils.js',
+      'https://fastly.jsdelivr.net/npm/@mediapipe/camera_utils@0.1.1679/camera_utils.js'
+    ];
+
+    const FACE_MESH_URLS = [
+      'libs/face_mesh.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1637/face_mesh.js',
+      'https://unpkg.com/@mediapipe/face_mesh@0.4.1637/face_mesh.js',
+      'https://fastly.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1637/face_mesh.js'
+    ];
+
+    const LOCAL_FACE_MESH_ASSETS = new Set([
+      'face_mesh_solution_packed_assets_loader.js',
+      'face_mesh_solution_simd_wasm_bin.js',
+      'face_mesh_solution_simd_wasm_bin.wasm',
+      'face_mesh.binarypb'
+    ]);
+
+    const HAT_ASPECT = 380 / 600;
+    const SMOOTHING = 0.25;
+
+    let faceMesh = null;
+    let camera = null;
+    let smoothedPose = null;
+    let trackingActive = false;
+    let sizeMultiplier = parseFloat(sizeRange.value);
+    let lastFaceTs = 0;
+    let libraryLoadPromise = null;
+
+    const loadedScripts = new Set();
+
+    // Color-coded status messaging for the pill indicator.
+    function setStatus(message, tone = 'info') {
+      if (!statusEl || !statusPill) {
+        return;
+      }
+      const trimmed = message ? message.trim() : '';
+      let fallback = 'Working...';
+      if (tone === 'ready') fallback = 'All set';
+      else if (tone === 'idle') fallback = 'Waiting to begin';
+      else if (tone === 'error') fallback = 'Action needed';
+      else if (tone === 'warn') fallback = 'Hold steady';
+
+      statusPill.textContent = trimmed || fallback;
+      statusPill.classList.remove('ready', 'alert', 'idle', 'warn');
+      if (tone === 'ready') {
+        statusPill.classList.add('ready');
+      } else if (tone === 'error') {
+        statusPill.classList.add('alert');
+      } else if (tone === 'idle') {
+        statusPill.classList.add('idle');
+      } else if (tone === 'warn') {
+        statusPill.classList.add('warn');
+      }
+      statusEl.hidden = false;
+    }
+
+    function setStartLoading(isLoading) {
+      if (isLoading) {
+        startBtn.classList.add('is-busy');
+      } else {
+        startBtn.classList.remove('is-busy');
+      }
+    }
+
+    function loadScriptOnce(url) {
+      if (loadedScripts.has(url)) {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = true;
+        script.onload = () => {
+          loadedScripts.add(url);
+          resolve();
+        };
+        script.onerror = () => {
+          script.remove();
+          reject(new Error('Failed to load ' + url));
+        };
+        document.head.appendChild(script);
+      });
+    }
+
+    async function loadWithFallback(urls, label) {
+      let lastError = null;
+      for (const url of urls) {
+        try {
+          await loadScriptOnce(url);
+          return;
+        } catch (error) {
+          lastError = error;
+          console.warn(`Failed to load ${label} from ${url}`, error);
+        }
+      }
+      const message = lastError
+        ? `Failed to load ${label}. Last error: ${lastError.message}`
+        : `Failed to load ${label}. No URLs provided.`;
+      throw new Error(message);
+    }
+
+    async function ensureLibrariesLoaded() {
+      if (libraryLoadPromise) return libraryLoadPromise;
+
+      libraryLoadPromise = (async () => {
+        await loadWithFallback(CAMERA_UTIL_URLS, 'camera_utils');
+        await loadWithFallback(FACE_MESH_URLS, 'face_mesh');
+      })();
+
+      return libraryLoadPromise;
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function mirrorX(x, width) {
+      return (1 - x) * width;
+    }
+
+    function computePose(landmarks) {
+      const width = stage.clientWidth;
+      const height = stage.clientHeight;
+      if (!width || !height) return null;
+
+      const top = landmarks[10];
+      const left = landmarks[234];
+      const right = landmarks[454];
+      if (!top || !left || !right) return null;
+
+      const leftX = mirrorX(left.x, width);
+      const leftY = left.y * height;
+      const rightX = mirrorX(right.x, width);
+      const rightY = right.y * height;
+      const topX = mirrorX(top.x, width);
+      const topY = top.y * height;
+      const headWidth = Math.hypot(rightX - leftX, rightY - leftY);
+      if (!headWidth) return null;
+
+      const hatWidth = headWidth * 1.55 * sizeMultiplier;
+      const hatHeight = hatWidth * HAT_ASPECT;
+      const centerX = topX;
+      const centerY = topY - hatHeight * 0.55;
+
+      return { x: centerX, y: centerY, width: hatWidth };
+    }
+
+    function applyPose(pose) {
+      hat.style.left = `${pose.x}px`;
+      hat.style.top = `${pose.y}px`;
+      hat.style.width = `${pose.width}px`;
+      hat.style.opacity = 1;
+      hat.style.transform = 'translate(-50%, -50%)';
+
+      if (hatName.textContent) {
+        const fontSize = Math.max(14, Math.min(36, pose.width * 0.12));
+        hatName.style.fontSize = `${fontSize}px`;
+        hatName.style.opacity = 1;
+      }
+    }
+
+    function fadeHat() {
+      hat.style.opacity = 0;
+      hatName.style.opacity = 0;
+    }
+
+    function onResults(results) {
+      const face = results.multiFaceLandmarks && results.multiFaceLandmarks[0];
+      if (!trackingActive) return;
+
+      if (!face) {
+        const now = performance.now();
+        if (now - lastFaceTs > 800) {
+          setStatus('Looking for a face...', 'warn');
+        }
+        fadeHat();
+        return;
+      }
+
+      lastFaceTs = performance.now();
+      setStatus('Hat locked in!', 'ready');
+      const targetPose = computePose(face);
+      if (!targetPose) {
+        fadeHat();
+        return;
+      }
+
+      if (!smoothedPose) {
+        smoothedPose = targetPose;
+      } else {
+        smoothedPose = {
+          x: lerp(smoothedPose.x, targetPose.x, SMOOTHING),
+          y: lerp(smoothedPose.y, targetPose.y, SMOOTHING),
+          width: lerp(smoothedPose.width, targetPose.width, SMOOTHING)
+        };
+      }
+
+      applyPose(smoothedPose);
+    }
+
+    function getFaceMeshCtor() {
+      const lib = window.FaceMesh || window.faceMesh || window.mpFaceMesh;
+      if (!lib) return null;
+      return lib.FaceMesh || lib;
+    }
+
+    function getCameraCtor() {
+      return window.Camera || window.CameraUtils?.Camera || null;
+    }
+
+    async function start() {
+      if (trackingActive) return;
+
+      setStatus('Preparing session...');
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus('Camera API not supported in this browser.', 'error');
+        return;
+      }
+
+      setStartLoading(true);
+      startBtn.disabled = true;
+
+      try {
+        setStatus('Loading tracking libraries...');
+        await ensureLibrariesLoaded();
+      } catch (error) {
+        console.error('Tracking library load failed', error);
+        setStatus('Could not load tracking libraries: ' + (error?.message || 'unknown error') + '. If you are offline, download the scripts into ./libs and try again.', 'error');
+        setStartLoading(false);
+        startBtn.disabled = false;
+        return;
+      }
+
+      const FaceMeshCtor = getFaceMeshCtor();
+      if (!FaceMeshCtor) {
+        setStatus('FaceMesh library is still unavailable after loading. Refresh the page.', 'error');
+        setStartLoading(false);
+        startBtn.disabled = false;
+        return;
+      }
+
+      const CameraCtor = getCameraCtor();
+      if (!CameraCtor) {
+        setStatus('Camera utils script did not load. Refresh and retry.', 'error');
+        setStartLoading(false);
+        startBtn.disabled = false;
+        return;
+      }
+
+      try {
+        faceMesh = new FaceMeshCtor({
+          locateFile: (file) => {
+            if (loadedScripts.has('libs/face_mesh.js') && LOCAL_FACE_MESH_ASSETS.has(file)) {
+              return `libs/${file}`;
+            }
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+          }
+        });
+
+        faceMesh.setOptions({
+          maxNumFaces: 1,
+          refineLandmarks: true,
+          minDetectionConfidence: 0.6,
+          minTrackingConfidence: 0.6
+        });
+
+        faceMesh.onResults(onResults);
+
+        camera = new CameraCtor(video, {
+          onFrame: async () => {
+            await faceMesh.send({ image: video });
+          },
+          width: 1280,
+          height: 720
+        });
+
+        setStatus('Starting camera...');
+        await camera.start();
+        if (stagePlaceholder) {
+          // Fade placeholder once live feed is running.
+          stagePlaceholder.classList.add('hidden');
+        }
+        setStartLoading(false);
+        trackingActive = true;
+        stopBtn.disabled = false;
+        setStatus('Move into view so the hat can lock on.', 'ready');
+      } catch (error) {
+        setStatus('Camera setup failed: ' + (error?.message || String(error)), 'error');
+        stop({ silent: true });
+      } finally {
+        if (!trackingActive) {
+          startBtn.disabled = false;
+          setStartLoading(false);
+        }
+      }
+    }
+
+    function stop(options = {}) {
+      const silent = options.silent === true;
+      trackingActive = false;
+
+      if (camera) {
+        camera.stop();
+        camera = null;
+      }
+
+      if (video.srcObject) {
+        for (const track of video.srcObject.getTracks()) {
+          track.stop();
+        }
+        video.srcObject = null;
+      }
+
+      if (faceMesh && typeof faceMesh.close === 'function') {
+        faceMesh.close();
+      }
+      faceMesh = null;
+      smoothedPose = null;
+      fadeHat();
+      stopBtn.disabled = true;
+      startBtn.disabled = false;
+      setStartLoading(false);
+      if (stagePlaceholder) {
+        // Restore placeholder when the session stops.
+        stagePlaceholder.classList.remove('hidden');
+      }
+      if (!silent) {
+        setStatus('Camera idle. Hit start when you are ready.', 'idle');
+      }
+    }
+
+    function handleNameInput() {
+      const text = nameInput.value.trim();
+      if (text) {
+        hatName.textContent = text.toUpperCase();
+      } else {
+        hatName.textContent = '';
+        hatName.style.opacity = 0;
+      }
+    }
+
+    sizeRange.addEventListener('input', () => {
+      sizeMultiplier = parseFloat(sizeRange.value);
+      smoothedPose = null;
+    });
+
+    centerBtn.addEventListener('click', () => {
+      smoothedPose = null;
+      setStatus('Tracking reset. Hold still for a moment.', 'warn');
+    });
+
+    nameInput.addEventListener('input', handleNameInput);
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', () => stop());
+    window.addEventListener('resize', () => {
+      smoothedPose = null;
+    });
+    video.addEventListener('loadedmetadata', () => {
+      smoothedPose = null;
+    });
+    window.addEventListener('beforeunload', () => stop({ silent: true }));
+
+    setStatus('Waiting to begin', 'idle');
+    handleNameInput();
+    fadeHat();
+  </script>
+</body>
+</html>
